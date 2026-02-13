@@ -1,4 +1,4 @@
-"""Anthropic tool-use / agent patterns scanner."""
+"""Anthropic Agent SDK scanner."""
 from __future__ import annotations
 import re
 from pathlib import Path
@@ -13,6 +13,9 @@ ANTHROPIC_IMPORTS = ["anthropic", "from anthropic"]
 
 MESSAGES_CREATE_PATTERN = re.compile(r'\.messages\.create|client\.messages')
 TOOL_USE_PATTERN = re.compile(r'tool_use|tool_choice|tools\s*=')
+AGENT_SDK_PATTERN = re.compile(r'from\s+anthropic\.agent|from\s+anthropic\s+import\s+Agent|Agent\s*\(')
+HANDOFF_PATTERN = re.compile(r'handoff|Handoff|hand_off')
+GUARDRAIL_PATTERN = re.compile(r'guardrail|Guardrail|input_guardrail|output_guardrail')
 COMPUTER_USE_PATTERN = re.compile(r'computer_use|computer_20|ComputerTool')
 MULTI_TURN_PATTERN = re.compile(r'while.*tool_use|for.*tool_use|stop_reason.*tool_use')
 
@@ -83,9 +86,13 @@ class AnthropicAgentsScanner(BaseScanner):
 
         has_messages = bool(MESSAGES_CREATE_PATTERN.search(content))
         has_tool_use = bool(TOOL_USE_PATTERN.search(content))
-        if not (has_messages or has_tool_use):
+        has_agent_sdk = bool(AGENT_SDK_PATTERN.search(content))
+        has_handoff = bool(HANDOFF_PATTERN.search(content))
+        has_guardrail = bool(GUARDRAIL_PATTERN.search(content))
+        if not (has_messages or has_tool_use or has_agent_sdk):
             return agents, credentials, trust_rels, findings
 
+        sdk_type = "agent_sdk" if has_agent_sdk else "tool_use"
         agent_id = f"anthropic:{path.stem}"
         agent = Agent(
             id=agent_id,
@@ -93,7 +100,7 @@ class AnthropicAgentsScanner(BaseScanner):
             framework=Framework.ANTHROPIC,
             identity_type="none",
             source_file=str(path),
-            metadata={"sdk": "anthropic"},
+            metadata={"sdk": sdk_type},
         )
 
         # Tool execution inherits host credentials
@@ -115,6 +122,39 @@ class AnthropicAgentsScanner(BaseScanner):
                 description=f"File '{path.name}' uses Anthropic computer_use. This grants the agent broad access to the system (screen, keyboard, mouse) with no agent-level identity binding. The agent operates with the full permissions of the hosting environment.",
                 affected=[agent_id],
                 recommendation="Isolate computer_use in a sandboxed environment with minimal privileges. Implement agent identity binding for audit trails.",
+                category="identity_spoofing",
+            ))
+
+        # Agent SDK: no cryptographic identity for agent instances
+        if has_agent_sdk:
+            findings.append(Finding(
+                severity=Severity.HIGH,
+                title="Anthropic Agent SDK provides no cryptographic agent identity",
+                description=f"File '{path.name}' uses the Anthropic Agent SDK. Agent instances have no cryptographic identity binding. Downstream systems cannot verify which agent instance performed an action.",
+                affected=[agent_id],
+                recommendation="Implement AAIP identity strings or equivalent cryptographic agent identity",
+                category="identity_spoofing",
+            ))
+
+        # Agent SDK handoff: identity not verified across handoffs
+        if has_handoff:
+            findings.append(Finding(
+                severity=Severity.HIGH,
+                title="Agent handoffs lack identity verification",
+                description=f"File '{path.name}' uses agent handoffs. When control transfers between agents, the receiving agent cannot cryptographically verify the identity of the handing-off agent. A compromised agent could forge handoff messages.",
+                affected=[agent_id],
+                recommendation="Implement signed handoff tokens with agent identity verification",
+                category="identity_spoofing",
+            ))
+
+        # Guardrails vs identity
+        if has_guardrail and not has_agent_sdk:
+            findings.append(Finding(
+                severity=Severity.MEDIUM,
+                title="Guardrails present but no agent identity layer",
+                description=f"File '{path.name}' implements guardrails but has no agent identity binding. Guardrails enforce behavior constraints but do not prove which agent is acting.",
+                affected=[agent_id],
+                recommendation="Pair guardrails with cryptographic agent identity for full trust assurance",
                 category="identity_spoofing",
             ))
 

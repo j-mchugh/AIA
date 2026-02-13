@@ -24,6 +24,9 @@ from .scanners.openclaw import OpenClawScanner
 from .scanners.openai_agents import OpenAIAgentsScanner
 from .scanners.anthropic_agents import AnthropicAgentsScanner
 from .scanners.pi_agent import PiAgentScanner
+from .scanners.copilot_studio import CopilotStudioScanner
+from .scanners.langgraph import LangGraphScanner
+from .scanners.a2a import A2AScanner
 from .analyzers.aaip import check_aaip_compliance
 from .analyzers.spoofing import analyze_spoofing_risks, analyze_delegation_risks
 from .analyzers.trust_chain import analyze_trust_chain
@@ -43,6 +46,9 @@ SCANNERS = [
     OpenAIAgentsScanner(),
     AnthropicAgentsScanner(),
     PiAgentScanner(),
+    CopilotStudioScanner(),
+    LangGraphScanner(),
+    A2AScanner(),
 ]
 
 console = Console()
@@ -227,17 +233,21 @@ def scan(config, directory, output_format, output, include_system, no_system, gr
 
 @main.command(name="trust-map")
 @click.option("--dir", "-d", "directory", type=click.Path(exists=True), default=None, help="Directory to scan (default: home)")
+@click.option("--include-system", is_flag=True, default=True, help="Also scan system-wide configs (default: True)")
+@click.option("--no-system", is_flag=True, help="Skip system-wide configs, only scan target directory")
 @click.option("--graph", type=click.Path(), help="Output DOT file")
-def trust_map(directory, graph):
+def trust_map(directory, include_system, no_system, graph):
     """Map trust chains between agents, credentials, and services.
 
     Shows which agents share credentials, where single points of failure
     exist, and which trust relationships lack mutual authentication.
     """
     scan_path = Path(directory) if directory else Path.home()
+    if no_system:
+        include_system = False
     console.print(f"\n[bold blue]AIA Trust Chain Map:[/bold blue] {scan_path.resolve()}")
 
-    agents, creds, trust, findings, frameworks = _run_scanners(scan_path)
+    agents, creds, trust, findings, frameworks = _run_scanners(scan_path, include_system)
 
     if not agents:
         console.print("[yellow]No agents found.[/yellow]")
@@ -262,16 +272,20 @@ def trust_map(directory, graph):
 
 @main.command()
 @click.option("--dir", "-d", "directory", type=click.Path(exists=True), default=None, help="Directory to scan (default: home)")
-def scope(directory):
+@click.option("--include-system", is_flag=True, default=True, help="Also scan system-wide configs (default: True)")
+@click.option("--no-system", is_flag=True, help="Skip system-wide configs, only scan target directory")
+def scope(directory, include_system, no_system):
     """Analyze credential scope for excess privilege and hygiene issues.
 
     Checks for overly broad scopes, missing expiry, hardcoded credentials,
     non-rotatable secrets, and user-inherited credentials.
     """
     scan_path = Path(directory) if directory else Path.home()
+    if no_system:
+        include_system = False
     console.print(f"\n[bold blue]AIA Credential Scope Analysis:[/bold blue] {scan_path.resolve()}")
 
-    agents, creds, trust, findings, frameworks = _run_scanners(scan_path)
+    agents, creds, trust, findings, frameworks = _run_scanners(scan_path, include_system)
 
     if not creds:
         console.print("[yellow]No credentials found.[/yellow]")

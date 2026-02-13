@@ -2,17 +2,17 @@ Metadata-Version: 2.4
 Name: aia-tool
 Version: 0.2.0
 Summary: Agent Identity Auditor - Map trust chains, analyze credential scope, and detect identity spoofing in AI agent deployments
-Author-email: Preamble <hello@preamble.com>
-License: MIT
-Project-URL: Homepage, https://preamble.com
-Project-URL: Repository, https://github.com/preambleai/aia
-Project-URL: Issues, https://github.com/preambleai/aia/issues
+Author: Jeremy McHugh
+License: Apache-2.0
+Project-URL: Homepage, https://mchugh.ai
+Project-URL: Repository, https://github.com/j-mchugh/AIA
+Project-URL: Issues, https://github.com/j-mchugh/AIA/issues
 Keywords: security,ai,agents,identity,authentication,trust-chain,mcp
 Classifier: Development Status :: 4 - Beta
 Classifier: Environment :: Console
 Classifier: Intended Audience :: Developers
 Classifier: Intended Audience :: Information Technology
-Classifier: License :: OSI Approved :: MIT License
+Classifier: License :: OSI Approved :: Apache Software License
 Classifier: Programming Language :: Python :: 3
 Classifier: Programming Language :: Python :: 3.10
 Classifier: Programming Language :: Python :: 3.11
@@ -62,7 +62,7 @@ AIA is a security auditing tool that examines how AI agents authenticate, what c
 **From source (recommended for now):**
 
 ```bash
-git clone https://github.com/preambleai/aia.git
+git clone https://github.com/j-mchugh/AIA.git
 cd aia
 pip install -e .
 ```
@@ -187,7 +187,7 @@ The score gives you a quick read on overall posture. Individual findings include
 ## Development
 
 ```bash
-git clone https://github.com/preambleai/aia.git
+git clone https://github.com/j-mchugh/AIA.git
 cd aia
 python -m venv .venv
 source .venv/bin/activate
@@ -202,8 +202,8 @@ aia report --help
 
 ## License
 
-MIT - see [LICENSE](LICENSE).
+Apache 2.0 - see [LICENSE](LICENSE).
 
 ---
 
-Built by [Preamble](https://preamble.com)
+Built by [j-mchugh](https://mchugh.ai)

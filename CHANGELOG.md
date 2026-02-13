@@ -1,6 +1,20 @@
 # Changelog
 
-## v0.2.0 (2025-02-12)
+## v0.3.0 (2026-02-13)
+
+### Features
+
+- **11 Framework Scanners** - Added Google A2A, LangGraph, and Microsoft Copilot Studio scanners
+- **Anthropic Agent SDK** - Renamed from "Anthropic Claude/MCP" to reflect the new Agent SDK; added detection for Agent(), handoffs, and guardrails with 3 new finding types
+- **Consistent CLI flags** - `--include-system` / `--no-system` now available on all commands (scan, trust-map, scope)
+
+### Frameworks Now Supported
+
+MCP, Google A2A, LangChain, LangGraph, CrewAI, AutoGen, OpenClaw, OpenAI Agents SDK, Anthropic Agent SDK, Microsoft Copilot Studio, Pi Agent
+
+---
+
+## v0.2.0 (2026-02-12)
 
 ### Features
 

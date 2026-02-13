@@ -34,6 +34,9 @@ class Framework(str, Enum):
     OPENAI_AGENTS = "openai_agents"
     ANTHROPIC = "anthropic"
     PI_AGENT = "pi_agent"
+    COPILOT_STUDIO = "copilot_studio"
+    LANGGRAPH = "langgraph"
+    A2A = "a2a"
     UNKNOWN = "unknown"
 
 

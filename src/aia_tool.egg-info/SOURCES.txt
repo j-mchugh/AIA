@@ -15,11 +15,14 @@ src/aia/reporters/graph.py
 src/aia/reporters/html.py
 src/aia/reporters/terminal.py
 src/aia/scanners/__init__.py
+src/aia/scanners/a2a.py
 src/aia/scanners/anthropic_agents.py
 src/aia/scanners/autogen.py
 src/aia/scanners/base.py
+src/aia/scanners/copilot_studio.py
 src/aia/scanners/crewai.py
 src/aia/scanners/langchain.py
+src/aia/scanners/langgraph.py
 src/aia/scanners/mcp.py
 src/aia/scanners/openai_agents.py
 src/aia/scanners/openclaw.py
