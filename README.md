@@ -22,7 +22,10 @@ AIA is a security auditing tool that examines how AI agents authenticate, what c
 | **AutoGen** | Multi-agent configs, code execution permissions |
 | **OpenClaw** | Gateway configs, agent identity, tool policies |
 | **OpenAI Agents SDK** | Agent definitions, tool auth, handoff patterns |
-| **Anthropic Claude/MCP** | Claude Desktop configs, MCP server trust |
+| **Anthropic Agent SDK** | Agent definitions, handoffs, guardrails, tool-use patterns |
+| **Google A2A** | AgentCard declarations, security schemes, credential bootstrapping |
+| **LangGraph** | State graphs, shared state across nodes, checkpointer configs |
+| **Microsoft Copilot Studio** | Power Platform configs, OAuth connectors, Dataverse access |
 | **Pi Agent** | Agent manifests, capability declarations |
 
 ## Installation
